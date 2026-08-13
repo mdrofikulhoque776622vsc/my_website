@@ -17,7 +17,7 @@
             --primary-glow: rgba(79, 70, 229, 0.4);
             --accent-cyan: #06b6d4;
             --accent-emerald: #10b981;
-            --danger-red: #ef4444; /* FIXED: Added missing danger color variable */
+            --danger-red: #ef4444;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --radius-lg: 16px;
@@ -92,7 +92,7 @@
             font-size: clamp(2rem, 3.5vw, 2.8rem);
             font-weight: 800;
             background: linear-gradient(135deg, #fff, var(--text-muted));
-            background-clip: text;            /* ADD THIS LINE */
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -171,12 +171,13 @@
             margin-bottom: 1.5rem;
         }
 
-         .hero h1 span {
+        .hero h1 span {
             background: linear-gradient(135deg, var(--accent-cyan), var(--primary));
-            background-clip: text;            /* ADD THIS LINE */
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+
         .hero p {
             font-size: 1.2rem;
             color: var(--text-muted);
@@ -367,10 +368,11 @@
             border: 2px solid var(--primary);
         }
 
+        /* Modal & Form Frame Styling */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             backdrop-filter: blur(8px);
             display: flex;
             align-items: center;
@@ -390,20 +392,34 @@
             background: #0f172a;
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            padding: 2.5rem;
-            width: min(90%, 500px);
+            padding: 2rem 1.5rem 1.5rem;
+            width: min(92%, 600px);
+            max-height: 90vh;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .close-modal {
             position: absolute;
-            top: 20px;
+            top: 15px;
             right: 20px;
             background: none;
             border: none;
             color: white;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             cursor: pointer;
+            z-index: 10;
+        }
+
+        .google-form-iframe {
+            width: 100%;
+            height: 550px;
+            border: none;
+            border-radius: var(--radius-md);
+            background: #ffffff;
+            margin-top: 1rem;
         }
 
         footer {
@@ -417,6 +433,7 @@
             .nav-links { display: none; }
             .hero-actions { flex-direction: column; }
             .form-group { flex-direction: column; }
+            .google-form-iframe { height: 480px; }
         }
     </style>
 </head>
@@ -470,7 +487,6 @@
                 <p>Custom-crafted courses for every stage of your competitive journey</p>
             </div>
 
-            <!-- FIXED: Passed `event` explicitly into filterCourses function -->
             <div class="tabs">
                 <button class="tab-btn active" onclick="filterCourses(event, 'all')">All Courses</button>
                 <button class="tab-btn" onclick="filterCourses(event, 'jee')">IIT-JEE</button>
@@ -574,25 +590,14 @@
         </div>
     </section>
 
+    <!-- Embedded Google Form Inside Application Modal -->
     <div class="modal-overlay" id="enrollModal">
         <div class="modal-content">
             <button class="close-modal" onclick="closeModal()">&times;</button>
-            <h3 style="margin-bottom: 10px;">Book a Free Counseling Session</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Speak with an academic expert to select your ideal batch.</p>
+            <h3 style="margin-bottom: 5px; text-align: center;">Book a Free Counseling Session</h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem; text-align: center;">Fill out the form below and an academic counsellor will reach out.</p>
             
-            <form onsubmit="handleFormSubmit(event)">
-                <div style="display: flex; flex-direction: column; gap: 1rem;">
-                    <input type="text" placeholder="Student's Full Name" class="input-field" required>
-                    <input type="tel" placeholder="Phone Number" class="input-field" required>
-                    <select class="input-field" style="color: #888;" required>
-                        <option value="">Select Target Exam</option>
-                        <option value="jee">IIT-JEE Main & Advanced</option>
-                        <option value="neet">NEET-UG</option>
-                        <option value="foundation">Class 8-10 Foundation</option>
-                    </select>
-                    <button type="submit" class="btn btn-primary" style="justify-content: center; margin-top: 10px;">Submit Application</button>
-                </div>
-            </form>
+            <iframe class="google-form-iframe" src="https://docs.google.com/forms/d/e/1FAIpQLSdRhoD6zgseXdsT5kLTj5bUQ3s0VrUXMgWPTlajmQmUboe_BQ/viewform?embedded=true" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
         </div>
     </div>
 
@@ -603,7 +608,6 @@
     </footer>
 
     <script>
-        // FIXED: Explicitly accepts the click event parameter `evt`
         function filterCourses(evt, category) {
             const cards = document.querySelectorAll('.course-card');
             const buttons = document.querySelectorAll('.tab-btn');
@@ -625,7 +629,7 @@
             const resultDiv = document.getElementById('rankResult');
 
             if (isNaN(score) || score < 0 || score > 300) {
-                resultDiv.style.color = 'var(--danger-red)'; // FIXED: Now references valid CSS variable
+                resultDiv.style.color = 'var(--danger-red)';
                 resultDiv.textContent = 'Please enter a valid score between 0 and 300.';
                 return;
             }
@@ -650,12 +654,6 @@
 
         function closeModal() {
             document.getElementById('enrollModal').classList.remove('active');
-        }
-
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            alert('Application received! An academic counsellor will contact you shortly.');
-            closeModal();
         }
     </script>
 </body>
