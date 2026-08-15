@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex JEE & NEET Academy | Premier Learning Portal</title>
+    <style>
+        /* =========================================================
+           1. CORE STYLES & RESET (position: static by default)
+           ========================================================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --success: #10b981;
+            --bg-body: #0f172a;
+            --surface: #1e293b;
+            --surface-card: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-top: 110px; /* Offset for dual fixed top headers */
+        }
+
+        /* =========================================================
+           2. FIXED POSITIONING (Top Announcement, Navbar, Toast & Chat)
+           ========================================================= */
+        
+        /* Fixed Announcement Top Ribbon */
+        .announcement-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 35px;
+            background: linear-gradient(90deg, #b91c1c, #4338ca);
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1002;
+        }
+
+        /* Main Fixed Glassmorphism Navigation Bar */
+        .navbar {
+            position: fixed;
+            top: 35px; /* Below announcement bar */
+            left: 0;
+            width: 100%;
+            height: 75px;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%;
+            border-bottom: 1px solid var(--border);
+            z-index: 1001;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .logo span { color: var(--accent); }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--text-main); }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* Fixed Bottom-Left Live Purchase Notification Toast */
+        .live-toast {
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            background: var(--surface);
+            border: 1px solid var(--primary);
+            padding: 12px 18px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 999;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Fixed Bottom-Right Floating Support Button & Chat Box */
+        .chat-toggle {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-box {
+            position: fixed;
+            bottom: 95px;
+            right: 24px;
+            width: 360px;
+            height: 480px;
+            background: var(--surface);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            display: none; /* Controlled by JS */
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        /* =========================================================
+           3. RELATIVE & ABSOLUTE COMBINATIONS
+           ========================================================= */
+        
+        /* Relative Container for Cart Badge */
+        .cart-btn {
+            position: relative;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Absolute Badge on Cart Button */
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--danger);
+            color: white;
+            font-size: 0.75rem;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        /* Hero Banner (Relative anchor for glow effects and floating stats) */
+        .hero {
+            position: relative;
+            padding: 80px 5% 60px;
+            text-align: center;
+            background: radial-gradient(circle at center, #1e1b4b 0%, #0f172a 100%);
+            overflow: hidden;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Absolute Glowing Background Aura */
+        .hero-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(99,102,241,0.2) 0%, rgba(0,0,0,0) 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .hero h1 { font-size: 3rem; margin-bottom: 16px; font-weight: 800; }
+        .hero p { color: var(--text-muted); font-size: 1.2rem; margin-bottom: 24px; }
+
+        /* RELATIVE COURSE CARDS FOR ABSOLUTE BADGES */
+        .course-card {
+            position: relative;
+            background: var(--surface);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 32px rgba(0,0,0,0.3);
+        }
+
+        .thumbnail-container {
+            position: relative; /* Context for play icon and discount tag */
+            width: 100%;
+            height: 180px;
+            background: #1e293b;
+        }
+
+        .thumbnail-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.8;
+        }
+
+        /* Absolute Badges pinned inside thumbnail */
+        .abs-badge-discount {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: var(--danger);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .abs-badge-live {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .abs-play-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 48px;
+            height: 48px;
+            background: rgba(37, 99, 235, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        /* =========================================================
+           4. STICKY POSITIONING (Sub-header, Sidebar, & FAQ Titles)
+           ========================================================= */
+        
+        /* Sticky Category Filter Toolbar */
+        .sticky-filter-bar {
+            position: sticky;
+            top: 110px; /* Sticks right underneath the dual fixed headers */
+            background: var(--bg-body);
+            padding: 16px 5%;
+            z-index: 990;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+        }
+
+        .filter-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+        .filter-btn.active, .filter-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* 2-Column Main Layout */
+        .page-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 36px;
+            max-width: 1350px;
+            margin: 40px auto;
+            padding: 0 5%;
+        }
+
+        /* STICKY RIGHT SIDEBAR SPOTLIGHT WIDGET */
+        .sticky-spotlight-sidebar {
+            position: sticky;
+            top: 180px; /* Locks 180px from top as left side scrolls */
+            height: fit-content;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        /* Sticky Section Headers inside long content lists */
+        .sticky-section-title {
+            position: sticky;
+            top: 170px;
+            background: var(--bg-body);
+            padding: 10px 0;
+            z-index: 10;
+            font-size: 1.5rem;
+            border-bottom: 2px solid var(--primary);
+            margin-bottom: 24px;
+        }
+
+        /* =========================================================
+           5. GENERAL LAYOUT & CONTENT STYLING
+           ========================================================= */
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 24px;
+            margin-bottom: 50px;
+        }
+
+        .card-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .card-title { font-size: 1.15rem; margin-bottom: 8px; font-weight: 700; }
+        .card-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px; }
+
+        .card-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .price-tag { font-size: 1.25rem; font-weight: 800; }
+        .price-tag span { font-size: 0.85rem; color: var(--text-muted); text-decoration: line-through; margin-left: 4px; }
+
+        .btn-enroll {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-enroll:hover { background: var(--primary-dark); }
+
+        .faq-item {
+            background: var(--surface);
+            padding: 16px 20px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+        }
+
+        /* Chat Window Content */
+        .chat-header {
+            background: var(--primary);
+            color: white;
+            padding: 16px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .msg { padding: 10px 14px; border-radius: 12px; font-size: 0.9rem; max-width: 85%; }
+        .msg-bot { background: var(--surface-card); align-self: flex-start; }
+        .msg-user { background: var(--primary); color: white; align-self: flex-end; }
+        .chat-input-bar { padding: 12px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+        .chat-input-bar input { flex-grow: 1; background: var(--surface-card); border: none; padding: 10px; border-radius: 8px; color: white; outline: none; }
+        .chat-input-bar button { background: var(--primary); border: none; color: white; padding: 10px 14px; border-radius: 8px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <!-- 1. FIXED TOP ANNOUNCEMENT RIBBON -->
+    <div class="announcement-bar">
+        🔥 Independence Special: Get extra 20% OFF on all JEE 2027 Batches. Use Code: APEX2026
+    </div>
+
+    <!-- 2. FIXED MAIN NAVIGATION HEADER -->
+    <header class="navbar">
+        <a href="#" class="logo">APEX<span>ACADEMY</span></a>
+        <ul class="nav-links">
+            <li><a href="#courses">All Batches</a></li>
+            <li><a href="#test-series">Test Series</a></li>
+            <li><a href="#syllabus">Syllabus</a></li>
+            <li><a href="#faq">Doubts & FAQ</a></li>
+        </ul>
+        <div class="nav-actions">
+            <!-- RELATIVE BUTTON WITH ABSOLUTE COUNTER BADGE -->
+            <button class="cart-btn" onclick="alert('Proceeding to checkout summary...')">
+                Cart
+                <div class="cart-count" id="cartBadgeCount">0</div>
+            </button>
+        </div>
+    </header>
+
+    <!-- 3. RELATIVE HERO SECTION WITH ABSOLUTE GLOW & OVERLAYS -->
+    <section class="hero">
+        <div class="hero-glow"></div>
+        <div class="hero-content">
+            <h1>Cracking JEE & NEET Starts Here</h1>
+            <p>Structured video courses, daily practice problems (DPPs), and 1-on-1 expert faculty guidance.</p>
+        </div>
+    </section>
+
+    <!-- 4. STICKY SUB-HEADER CATEGORY FILTER BAR -->
+    <nav class="sticky-filter-bar">
+        <button class="filter-btn active">All Batches</button>
+        <button class="filter-btn">JEE Main & Advanced</button>
+        <button class="filter-btn">NEET Medical</button>
+        <button class="filter-btn">Class 11 & 12 Boards</button>
+        <button class="filter-btn">Mathematics Special</button>
+        <button class="filter-btn">Physics Olympiad</button>
+    </nav>
+
+    <!-- 5. MAIN 2-COLUMN PAGE LAYOUT -->
+    <div class="page-layout">
+        
+        <!-- LEFT MAIN CONTENT COLUMN (Static Flow) -->
+        <main>
+            
+            <!-- STICKY SECTION HEADER 1 -->
+            <div class="sticky-section-title" id="courses">
+                🌟 Flagship Entrance Courses
+            </div>
+
+            <div class="course-grid">
+                
+                <!-- RELATIVE COURSE CARD 1 -->
+                <div class="course-card">
+                    <div class="thumbnail-container">
+                        <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=500&auto=format&fit=crop&q=60" class="thumbnail-img" alt="Math Course">
+                        <div class="abs-badge-discount">30% OFF</div>
+                        <div class="abs-badge-live"><div class="pulse-dot"></div> LIVE</div>
+                        <div class="abs-play-btn" onclick="openDemoVideo('Math Masterclass')">▶</div>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">IIT-JAM & JEE Complete Mathematics 2027</h3>
+                        <p class="card-desc">Comprehensive coverage of Calculus, Linear Algebra, and Coordinate Geometry with 200+ DPPs.</p>
+                        <div class="card-footer">
+                            <div class="price-tag">₹1,499 <span>₹2,199</span></div>
+                            <button class="btn-enroll" onclick="addToCart('Mathematics 2027')">Enroll Now</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RELATIVE COURSE CARD 2 -->
+                <div class="course-card">
+                    <div class="thumbnail-container">
+                        <img src="https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?w=500&auto=format&fit=crop&q=60" class="thumbnail-img" alt="Physics Course">
+                        <div class="abs-badge-discount">40% OFF</div>
+                        <div class="abs-badge-live"><div class="pulse-dot"></div> RECORDED</div>
+                        <div class="abs-play-btn" onclick="openDemoVideo('Physics Special')">▶</div>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Advanced Mechanics & Electrodynamics</h3>
+                        <p class="card-desc">Deep-dive problem solving methods for JEE Advanced Physics by senior faculties.</p>
+                        <div class="card-footer">
+                            <div class="price-tag">₹1,199 <span>₹1,999</span></div>
+                            <button class="btn-enroll" onclick="addToCart('Physics Mechanics')">Enroll Now</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RELATIVE COURSE CARD 3 -->
+                <div class="course-card">
+                    <div class="thumbnail-container">
+                        <img src="https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=500&auto=format&fit=crop&q=60" class="thumbnail-img" alt="Chemistry Course">
+                        <div class="abs-badge-discount">50% OFF</div>
+                        <div class="abs-badge-live"><div class="pulse-dot"></div> LIVE</div>
+                        <div class="abs-play-btn" onclick="openDemoVideo('Organic Chemistry')">▶</div>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">Organic & Inorganic Chemistry Masterbatch</h3>
+                        <p class="card-desc">Reaction mechanisms, periodic trends, and shortcut revision mind maps.</p>
+                        <div class="card-footer">
+                            <div class="price-tag">₹899 <span>₹1,799</span></div>
+                            <button class="btn-enroll" onclick="addToCart('Chemistry Masterbatch')">Enroll Now</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- STICKY SECTION HEADER 2 -->
+            <div class="sticky-section-title" id="test-series">
+                📝 All India Test Series (AITS)
+            </div>
+            
+            <p style="color: var(--text-muted); margin-bottom: 20px;">
+                Standardized mock examinations designed under real exam interface standards with instant Performance Analytics reports.
+            </p>
+
+            <div class="course-grid">
+                <div class="course-card">
+                    <div class="card-body">
+                        <h3 class="card-title">JEE Main 2027 Full Mock Series</h3>
+                        <p class="card-desc">25 Full Length Tests + Chapter-wise practice papers with detailed step solutions.</p>
+                        <div class="card-footer">
+                            <div class="price-tag">₹499 <span>₹999</span></div>
+                            <button class="btn-enroll" onclick="addToCart('JEE Test Series')">Get Series</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="course-card">
+                    <div class="card-body">
+                        <h3 class="card-title">NEET Medical 2027 Diagnostic Tests</h3>
+                        <p class="card-desc">30 Simulated NCERT-based Bio, Physics, and Chemistry full-syllabus tests.</p>
+                        <div class="card-footer">
+                            <div class="price-tag">₹499 <span>₹999</span></div>
+                            <button class="btn-enroll" onclick="addToCart('NEET Test Series')">Get Series</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STICKY SECTION HEADER 3 -->
+            <div class="sticky-section-title" id="faq">
+                ❓ Frequently Asked Questions
+            </div>
+
+            <div class="faq-item">
+                <h4>How do live doubt clearance sessions work?</h4>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 6px;">
+                    Students can upload handwritten questions directly via the portal or ask live during daily doubt hours between 4 PM to 7 PM.
+                </p>
+            </div>
+            <div class="faq-item">
+                <h4>Can I access lecture recordings if I miss a live class?</h4>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 6px;">
+                    Yes, all live streams are uploaded in 1080p HD quality inside your course dashboard within 2 hours of stream conclusion.
+                </p>
+            </div>
+
+        </main>
+
+        <!-- RIGHT SIDEBAR (Sticky Component) -->
+        <aside>
+            <div class="sticky-spotlight-sidebar">
+                <h3 style="margin-bottom: 12px; font-size: 1.1rem;">⚡ Featured Demo Class</h3>
+                <div style="background: #0f172a; height: 160px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; border: 1px solid var(--border);">
+                    <span style="font-size: 2.5rem; cursor: pointer;" onclick="alert('Playing Demo Video Player...')">▶️</span>
+                </div>
+                <h4 style="font-size: 1rem; margin-bottom: 8px;">Calculus: Limits & Continuity</h4>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+                    Watch this 15-minute sample lecture to experience our interactive whiteboarding teaching style.
+                </p>
+                <button class="btn-enroll" style="width: 100%;" onclick="addToCart('Flagship Combo Batch')">
+                    Enroll in Full Combo Batch
+                </button>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- 6. FIXED LIVE PURCHASE TOAST NOTIFICATION -->
+    <div class="live-toast" id="liveToast">
+        <span style="font-size: 1.2rem;">🎓</span>
+        <div>
+            <div style="font-size: 0.85rem; font-weight: 700;" id="toastUser">Robi from West Bengal</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);" id="toastCourse">Just enrolled in Math Masterclass</div>
+        </div>
+    </div>
+
+    <!-- 7. FIXED LIVE CHAT WIDGET -->
+    <button class="chat-toggle" onclick="toggleChatWindow()">💬</button>
+
+    <div class="chat-box" id="chatBox">
+        <div class="chat-header">
+            <span>Apex Counselor (Online)</span>
+            <span style="cursor: pointer;" onclick="toggleChatWindow()">✕</span>
+        </div>
+        <div class="chat-messages" id="chatMsgContainer">
+            <div class="msg msg-bot">
+                Welcome to Apex Academy! 🎓 Need help choosing between JEE & NEET batches? Ask me anything!
+            </div>
+        </div>
+        <div class="chat-input-bar">
+            <input type="text" id="chatInput" placeholder="Ask a question..." onkeypress="handleChatKey(event)">
+            <button onclick="sendChatMessage()">Send</button>
+        </div>
+    </div>
+
+    <!-- 8. JAVASCRIPT FOR INTERACTIVE LOGIC -->
+    <script>
+        let cartCount = 0;
+
+        // Add to Cart Logic
+        function addToCart(courseName) {
+            cartCount++;
+            document.getElementById('cartBadgeCount').innerText = cartCount;
+            alert(`"${courseName}" added to cart successfully!`);
+        }
+
+        function openDemoVideo(title) {
+            alert(`Opening 5-minute preview video for: ${title}`);
+        }
+
+        // Live Chat Toggle
+        function toggleChatWindow() {
+            const chatBox = document.getElementById('chatBox');
+            chatBox.style.display = chatBox.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        // Chat Message Handling
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const container = document.getElementById('chatMsgContainer');
+            
+            // User Message
+            const userMsg = document.createElement('div');
+            userMsg.className = 'msg msg-user';
+            userMsg.innerText = text;
+            container.appendChild(userMsg);
+            
+            input.value = '';
+            container.scrollTop = container.scrollHeight;
+
+            // Simulated AI/Counselor Bot Response
+            setTimeout(() => {
+                const botMsg = document.createElement('div');
+                botMsg.className = 'msg msg-bot';
+                botMsg.innerText = "Thanks for your query! Our academic counselor will respond to your account dashboard shortly.";
+                container.appendChild(botMsg);
+                container.scrollTop = container.scrollHeight;
+            }, 800);
+        }
+
+        function handleChatKey(e) {
+            if (e.key === 'Enter') sendChatMessage();
+        }
+
+        // Simulated Social Proof Toast Notifications
+        const sampleStudents = [
+            { name: "Amit from Kolkata", course: "Enrolled in Physics Mechanics" },
+            { name: "Priya from Siliguri", course: "Enrolled in NEET Diagnostic Series" },
+            { name: "Rahul from Durgapur", course: "Enrolled in IIT-JAM Mathematics" }
+        ];
+
+        let toastIndex = 0;
+        setInterval(() => {
+            const toast = document.getElementById('liveToast');
+            const data = sampleStudents[toastIndex];
+            
+            document.getElementById('toastUser').innerText = data.name;
+            document.getElementById('toastCourse').innerText = data.course;
+            
+            toast.style.display = 'flex';
+            setTimeout(() => { toast.style.display = 'none'; }, 4000);
+            
+            toastIndex = (toastIndex + 1) % sampleStudents.length;
+        }, 10000);
+    </script>
+</body>
+</html>
