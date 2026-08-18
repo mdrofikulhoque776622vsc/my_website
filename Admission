@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex Academy // Admissions Portal (Classes 5–12)</title>
+    
+    <style>
+        /* =========================================================
+           1. CORE ENGINE & OKLCH DESIGN TOKENS
+           ========================================================= */
+        :root {
+            --bg-body: oklch(0.97 0.01 240);
+            --bg-surface: oklch(1 0 0);
+            --bg-glass: oklch(1 0 0 / 0.85);
+            --text-primary: oklch(0.15 0.03 250);
+            --text-muted: oklch(0.48 0.03 250);
+            --accent-brand: oklch(0.52 0.22 250); /* Deep Regal Blue */
+            --accent-gold: oklch(0.72 0.18 75);    /* Academic Gold */
+            --accent-glow: oklch(0.52 0.22 250 / 0.2);
+            --border-color: oklch(0.90 0.02 240);
+            --radius-lg: 16px;
+            --radius-sm: 8px;
+            --header-height: 75px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        /* =========================================================
+           2. HEADER & ADMISSIONS TOP NAVIGATION
+           ========================================================= */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            height: var(--header-height);
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 4%;
+        }
+
+        .school-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: var(--accent-brand);
+        }
+
+        .school-badge {
+            background: var(--accent-gold);
+            color: black;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .nav-menu a:hover {
+            color: var(--accent-brand);
+        }
+
+        .header-cta {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-brand);
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: var(--accent-gold);
+            color: black;
+        }
+
+        .btn-outline {
+            border-color: var(--border-color);
+            background: transparent;
+            color: var(--text-primary);
+        }
+
+        /* =========================================================
+           3. PORTAL LAYOUT MATRIX
+           ========================================================= */
+        .portal-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr 300px;
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        /* Left Navigation Panel */
+        .sidebar-left {
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .category-title {
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .link-group {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .link-group a {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .link-group a:hover, .link-group a.active {
+            background: var(--bg-body);
+            color: var(--accent-brand);
+            font-weight: 700;
+        }
+
+        .tag {
+            background: oklch(0.92 0.04 250);
+            color: var(--accent-brand);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        /* Central Application Engine */
+        .main-portal {
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+
+            /* Container Query Registration */
+            container-type: inline-size;
+            container-name: portal;
+        }
+
+        .hero-admission {
+            background: linear-gradient(135deg, var(--accent-brand), oklch(0.35 0.18 260));
+            color: white;
+            padding: 36px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 0 10px 25px -5px var(--accent-glow);
+        }
+
+        .hero-admission h1 {
+            font-size: clamp(1.5rem, 2vw + 1rem, 2.5rem);
+            line-height: 1.2;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Interactive Grid Components */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .info-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .info-card h4 {
+            font-size: 1.05rem;
+            color: var(--accent-brand);
+        }
+
+        .info-card p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+
+        .action-link {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--accent-brand);
+            margin-top: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Multi-step Form Preview Component */
+        .form-container {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .form-group input, .form-group select {
+            padding: 10px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background: var(--bg-body);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        /* Right Quick-Tools Sidebar */
+        .sidebar-right {
+            background: var(--bg-surface);
+            border-left: 1px solid var(--border-color);
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .quick-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .quick-links a {
+            color: var(--text-muted);
+            display: block;
+            padding: 6px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .quick-links a:hover {
+            color: var(--accent-brand);
+        }
+
+        /* Footer Infrastructure */
+        footer {
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border-color);
+            padding: 48px 5% 24px 5%;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 32px;
+            margin-bottom: 32px;
+        }
+
+        .footer-col h4 {
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            color: var(--accent-brand);
+        }
+
+        /* =========================================================
+           4. ADVANCED MEDIA QUERIES SUITE
+           ========================================================= */
+
+        /* CONTAINER QUERIES: Main Workspace Adaptive Engine */
+        @container portal (min-width: 650px) {
+            .hero-admission {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+            .hero-text { max-width: 65%; }
+        }
+
+        /* SYSTEM COLOR SCHEME: Auto Dark Mode Sync */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: oklch(0.13 0.02 250);
+                --bg-surface: oklch(0.18 0.03 250);
+                --bg-glass: oklch(0.18 0.03 250 / 0.85);
+                --text-primary: oklch(0.96 0.01 240);
+                --text-muted: oklch(0.68 0.03 240);
+                --accent-brand: oklch(0.65 0.20 250);
+                --accent-gold: oklch(0.78 0.16 75);
+                --border-color: oklch(0.26 0.03 250);
+            }
+            .form-group input, .form-group select {
+                background: oklch(0.13 0.02 250);
+            }
+        }
+
+        /* TABLET & MEDIUM BREAKPOINTS */
+        @media screen and (max-width: 1150px) {
+            .portal-layout {
+                grid-template-columns: 240px 1fr; /* Hides Right Tools */
+            }
+            .sidebar-right { display: none; }
+        }
+
+        /* MOBILE BREAKPOINTS */
+        @media screen and (max-width: 768px) {
+            header { padding: 0 16px; }
+            .nav-menu { display: none; }
+            
+            .portal-layout {
+                grid-template-columns: 1fr; /* Single column on mobile */
+            }
+
+            .sidebar-left { display: none; }
+            .main-portal { padding: 16px; gap: 20px; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+
+        /* POINTER & ACCESSIBILITY MEDIA QUERIES */
+        @media (pointer: coarse) {
+            .btn, .link-group a, .quick-links a {
+                padding-top: 12px;
+                padding-bottom: 12px; /* Enlarges touch targets */
+            }
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .info-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 12px 24px -8px var(--accent-glow);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, .info-card {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+
+        /* PRINT STYLESHEET EXPORT */
+        @media print {
+            header, .sidebar-left, .sidebar-right, footer, .btn { display: none !important; }
+            .portal-layout { display: block; }
+            .main-portal { padding: 0; }
+            .info-card, .form-container { border: 1px solid #000; box-shadow: none; break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header / Branding Navigation -->
+    <header>
+        <div class="school-brand">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM3.89 9L12 4.57 20.11 9 12 13.43 3.89 9zM5 13.07v4.28l7 3.82 7-3.82v-4.28l-7 3.82-7-3.82z"/></svg>
+            <span>APEX ACADEMY</span>
+            <span class="school-badge">Classes 5–12</span>
+        </div>
+
+        <ul class="nav-menu">
+            <li><a href="#overview">Overview</a></li>
+            <li><a href="#middle-school">Middle School (5-8)</a></li>
+            <li><a href="#high-school">High School (9-10)</a></li>
+            <li><a href="#senior-secondary">Senior Sec (11-12)</a></li>
+            <li><a href="#fee-structure">Fees & Grants</a></li>
+        </ul>
+
+        <div class="header-cta">
+            <button class="btn btn-outline">Check Status</button>
+            <button class="btn btn-secondary">Portal Login</button>
+        </div>
+    </header>
+
+    <!-- Portal Layout -->
+    <div class="portal-layout">
+        
+        <!-- Left Navigation Sidebar -->
+        <aside class="sidebar-left">
+            <div>
+                <div class="category-title">Admissions Navigation</div>
+                <ul class="link-group">
+                    <li><a href="#process" class="active">Admission Process <span class="tag">2026-27</span></a></li>
+                    <li><a href="#eligibility">Eligibility Criteria</a></li>
+                    <li><a href="#schedules">Entrance Exam Schedule</a></li>
+                    <li><a href="#documents">Required Documents</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="category-title">Class Categories</div>
+                <ul class="link-group">
+                    <li><a href="#class-5-8">Middle Wing (Class 5–8)</a></li>
+                    <li><a href="#class-9-10">Secondary (Class 9–10)</a></li>
+                    <li><a href="#class-11-12">Sr. Secondary (Class 11–12) <span class="tag">Streams</span></a></li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="category-title">Downloads & Policy</div>
+                <ul class="link-group">
+                    <li><a href="#prospectus">Download Prospectus PDF</a></li>
+                    <li><a href="#syllabus">Entrance Syllabus</a></li>
+                    <li><a href="#scholarships">Scholarship Policies</a></li>
+                    <li><a href="#transfer">Transfer Certificates</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-portal">
+            
+            <!-- Hero Banner -->
+            <section class="hero-admission">
+                <div class="hero-text">
+                    <h1>Apex Academy Admissions Open 2026-2027</h1>
+                    <p style="margin-top: 8px; opacity: 0.9;">Empowering future leaders through academic excellence, character development, and advanced STEM/Humanities tracks.</p>
+                </div>
+                <button class="btn btn-secondary" style="padding: 12px 24px;">Start Application</button>
+            </section>
+
+            <!-- Academic Sections Grid -->
+            <div>
+                <div class="section-title">Academic Wings & Streams</div>
+                <div class="card-grid">
+                    <div class="info-card">
+                        <h4>Middle School (Classes 5–8)</h4>
+                        <p>Focuses on foundational concepts, creative thinking, digital literacy, and holistic personality development.</p>
+                        <a href="#middle-apply" class="action-link">View Middle Syllabus &rarr;</a>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>Secondary Wing (Classes 9–10)</h4>
+                        <p>Rigorous board preparation, lab-based practicals, and skill development programs.</p>
+                        <a href="#sec-apply" class="action-link">View Secondary Criteria &rarr;</a>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>Senior Secondary (Classes 11–12)</h4>
+                        <p>Specialized Streams: Science (PCM/PCB), Commerce, and Humanities with competitive exam coaching.</p>
+                        <a href="#sr-apply" class="action-link">Explore Stream Options &rarr;</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Registration Form Component -->
+            <div class="form-container">
+                <div class="section-title">Online Registration Form (Phase 1)</div>
+                <p style="font-size: 0.88rem; color: var(--text-muted);">Fill in the basic student details to initiate the registration process for the 2026-27 academic session.</p>
+
+                <form class="form-grid" onsubmit="event.preventDefault();">
+                    <div class="form-group">
+                        <label>Student's Full Name</label>
+                        <input type="text" placeholder="Enter full name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Applying for Class</label>
+                        <select required>
+                            <option value="">Select Class</option>
+                            <option>Class 5</option>
+                            <option>Class 6</option>
+                            <option>Class 7</option>
+                            <option>Class 8</option>
+                            <option>Class 9</option>
+                            <option>Class 10</option>
+                            <option>Class 11 (Science)</option>
+                            <option>Class 11 (Commerce)</option>
+                            <option>Class 11 (Humanities)</option>
+                            <option>Class 12</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Parent / Guardian Name</label>
+                        <input type="text" placeholder="Enter parent's name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Contact Mobile Number</label>
+                        <input type="tel" placeholder="+91 00000 00000" required>
+                    </div>
+
+                    <div style="grid-column: span 2; display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px;">
+                        <button type="reset" class="btn btn-outline">Reset Form</button>
+                        <button type="submit" class="btn btn-primary">Proceed to Registration Fee</button>
+                    </div>
+                </form>
+            </div>
+
+        </main>
+
+        <!-- Right Tools Sidebar -->
+        <aside class="sidebar-right">
+            <div>
+                <div class="category-title">Important Dates</div>
+                <ul class="quick-links">
+                    <li><a href="#d1"><strong>Form Deadline:</strong> Dec 31, 2026</a></li>
+                    <li><a href="#d2"><strong>Entrance Test:</strong> Jan 15, 2027</a></li>
+                    <li><a href="#d3"><strong>Results Declared:</strong> Jan 25, 2027</a></li>
+                    <li><a href="#d4"><strong>Session Starts:</strong> Apr 01, 2027</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <div class="category-title">Admissions Help Desk</div>
+                <ul class="quick-links">
+                    <li><a href="#h1">📞 Helpline: +91 98765 43210</a></li>
+                    <li><a href="#h2">✉️ Email: admissions@apexacademy.edu</a></li>
+                    <li><a href="#h3">💬 Live Chat with Counselor</a></li>
+                    <li><a href="#h4">📍 Campus Visit Registration</a></li>
+                </ul>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- Portal Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Admissions Links</h4>
+                <ul class="quick-links">
+                    <li><a href="#f1">Online Application Form</a></li>
+                    <li><a href="#f2">Fee Structure PDF</a></li>
+                    <li><a href="#f3">Scholarships & Financial Aid</a></li>
+                    <li><a href="#f4">Hostel & Transport Fees</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Class Academics</h4>
+                <ul class="quick-links">
+                    <li><a href="#f5">Class 5–8 Curriculum</a></li>
+                    <li><a href="#f6">Class 9–10 Board Prep</a></li>
+                    <li><a href="#f7">Class 11–12 Science Track</a></li>
+                    <li><a href="#f8">Class 11–12 Commerce Track</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Rules & Guidelines</h4>
+                <ul class="quick-links">
+                    <li><a href="#f9">Code of Conduct</a></li>
+                    <li><a href="#f10">Uniform & Dress Code</a></li>
+                    <li><a href="#f11">Medical & Health Forms</a></li>
+                    <li><a href="#f12">Withdrawal Policy</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Apex Academy Campus</h4>
+                <ul class="quick-links">
+                    <li><a href="#f13">Science & Robotics Labs</a></li>
+                    <li><a href="#f14">Sports Complex & Swimming Pool</a></li>
+                    <li><a href="#f15">Library & Digital Resource Center</a></li>
+                    <li><a href="#f16">Residential Boarding House</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-color); padding-top: 24px; display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); flex-wrap: wrap; gap: 12px;">
+            <p>&copy; 2026 Apex Academy. All rights reserved.</p>
+            <p>Admissions Portal v3.4 | Designed with Modern CSS & Media Queries</p>
+        </div>
+    </footer>
+
+</body>
+</html>
